@@ -1,50 +1,32 @@
-from .base_page import BasePage
-from .locators import ProductPageLocators
+from basket_page import BasePage
+from locators import ProductPageLocators
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 
 class ProductPage(BasePage):
-    def add_to_cart(self, is_promo=False) -> None:
-        self.browser.find_element(
-            *ProductPageLocators.BUTTON_ADD_TO_CART).click()
+    def should_add_to_cart(self):
+        button = self.browser.find_element(*ProductPageLocators.ADD_TO_CART)
+        button.click()
 
-        if is_promo:
-            self.solve_quiz_and_get_code()
+    def should_solve_quiz(self):
+        self.solve_quiz_and_get_code()
 
-    def should_be_present_in_cart(self) -> None:
-        assert self.is_element_present(
-            *ProductPageLocators.PRODUCT_NAME), "Product name is not present"
-        assert self.is_element_present(
-            *ProductPageLocators.ALERT_ADDED_TO_CART
-        ), "No alert that a product has been added to cart"
-        alert_text = self.browser.find_element(
-            *ProductPageLocators.ALERT_ADDED_TO_CART).text
-        product_name = self.browser.find_element(
-            *ProductPageLocators.PRODUCT_NAME).text
-        assert product_name == alert_text, \
-            f"The alert contains wrong product name: {alert_text} - {product_name}"
+    def alert_should_popup(self):
+        product_title = (self.browser.find_element(*ProductPageLocators.PRODUCT_TITLE)).text
+        confirmation_title = (self.browser.find_element(*ProductPageLocators.CONFIRMATION_TITLE)).text
+        assert product_title == confirmation_title, 'Added title does not match requested title'
 
-    def should_check_overall_cost(self) -> None:
-        assert self.is_element_present(
-            *ProductPageLocators.PRODUCT_PRICE), "Product price is not present"
-        assert self.is_element_present(*ProductPageLocators.ALERT_CART_STATUS
-                                       ), "No alert with cart status"
-        alert_text = self.browser.find_element(
-            *ProductPageLocators.ALERT_CART_STATUS).text.split()[-1]
-        product_cost = self.browser.find_element(
-            *ProductPageLocators.PRODUCT_PRICE).text
-        assert product_cost == alert_text, \
-            f"Product cost in cart is not equal to the product cost {alert_text} != {product_cost}"
+    def prices_should_match(self):
+        product_price = (self.browser.find_element(*ProductPageLocators.PRODUCT_PRICE)).text
+        cart_price = (self.browser.find_element(*ProductPageLocators.CART_PRICE)).text
+        assert product_price == cart_price, 'Prices do not match'
 
-    def should_not_see_success_message_after_adding_to_cart(self) -> None:
+    def should_not_be_present(self):
         assert self.is_not_element_present(
-            *ProductPageLocators.ADDING_SUCCESS
-        ), "Success element is visible for an user"
+            *ProductPageLocators.SUCCESS_MESSAGE), 'Success message is present, but shouldnt be'
 
-    def should_not_see_success_message_upon_opening_product_page(self) -> None:
-        assert self.is_not_element_present(
-            *ProductPageLocators.ADDING_SUCCESS
-        ), "Success element is visible for an user"
-
-    def should_disappeared_success_message(self) -> None:
-        assert self.is_disappeared(*ProductPageLocators.ADDING_SUCCESS
-                                   ), "Success message has not disappeared"
+    def should_disappear(self):
+        assert self.is_disappeared(*ProductPageLocators.SUCCESS_MESSAGE), "Success message should disappear"
