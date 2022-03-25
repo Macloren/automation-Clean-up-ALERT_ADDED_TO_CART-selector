@@ -1,5 +1,5 @@
-from base_page import BasePage
-from locators import LoginPageLocators
+from .base_page import BasePage
+from .locators import LoginPageLocators
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import pytest
