@@ -1,11 +1,8 @@
-from selenium.webdriver import Remote
-
-from .base_page import BasePage
-
+from base_page import BasePage
+from selenium.webdriver.common.by import By
+from locators import MainPageLocators
 
 class MainPage(BasePage):
-    """Represents the main page
-    """
-
-    def __init__(self, browser: Remote, url: str) -> None:
-        super().__init__(browser, url)
+    #Placeholder
+    def __init__(self, *args, **kwargs):
+        super(MainPage, self).__init__(*args, **kwargs)
